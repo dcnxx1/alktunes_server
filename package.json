@@ -1,0 +1,27 @@
+{
+  "name": "alktunes_server",
+  "version": "1.0.0",
+  "description": "Web server for alktunes",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dcnxx1/alktunes_server.git"
+  },
+  "keywords": [
+    "Webserver",
+    "Alktunes"
+  ],
+  "author": "Alkin Sali",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dcnxx1/alktunes_server/issues"
+  },
+  "homepage": "https://github.com/dcnxx1/alktunes_server#readme",
+  "dependencies": {
+    "nodemon": "^2.0.16",
+    "pm2": "^5.2.0"
+  }
+}
