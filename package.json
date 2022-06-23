@@ -4,7 +4,8 @@
   "description": "Web server for alktunes",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon main.js"
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,15 @@
   },
   "homepage": "https://github.com/dcnxx1/alktunes_server#readme",
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "i": "^0.3.7",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.3.3",
     "nodemon": "^2.0.16",
-    "pm2": "^5.2.0"
+    "npm": "^8.12.2",
+    "pm2": "^5.2.0",
+    "ssh2": "^1.11.0"
   }
 }
