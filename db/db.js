@@ -8,7 +8,7 @@ const sshClient = new Client()
 // for testing purposed only, uses private pem file key that was generated 
 // during the creation of the ec2 instance hosted on AWS
 
-// ssh tunnel
+// ssh tunnel config
 const dbSSH = {
     srcHost: 'localhost',
     srcPort: 3306,
@@ -31,6 +31,7 @@ const ec2Config = {
     privateKey: require('fs').readFileSync(path.join(__dirname, '../alktunes.pem')).toString()
 }
 
+// connect through SSH Tunnel
 const SSHConnect = new Promise((resolve , reject) => {
     sshClient.on('ready', () => {
         sshClient.forwardOut(dbSSH.srcHost, dbSSH.srcPort, dbSSH.dstHost, dbSSH.dstPort, (err, stream) => {
@@ -44,14 +45,15 @@ const SSHConnect = new Promise((resolve , reject) => {
                 stream: stream
             })    
             resolve(connection)
+            
         })
     }).connect(ec2Config)
 })
 
-
+// will be used automatically if APP_ENV value does not equal 'dev'
 function normalConnection () {
     return new Promise((resolve, reject) => {
-        const mysqlConnection = mysql.createConnection(dbServer)
+        const mysqlConnection = mysql.createConnection(dbServer)    
         mysqlConnection.connect((err, connection) => {
             err ? reject(err) : resolve(connection)
         })

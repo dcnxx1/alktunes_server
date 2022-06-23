@@ -11,19 +11,36 @@ module.exports = {
             statusCode: 500,
             message: "No such user exists"
         },
-        ERR_EMAIL_EXISTS : {
-            ERR: "EMAIL_EXISTS",
+        ERR_EMAIL_EXIST : {
+            ERR: "EMAIL_EXIST",
             statusCode: 500,
             message: "Email already exists"
         },
+        ERR_USER_EXIST: {
+            ERR: "USER_EXIST",
+            statusCode: 500,
+            message: "Username already exists"
+        },
+        ERR_EMAIL_USER_EXIST: {
+            ERR: "EMAIL_USER_EXIST",
+            statusCode: 500,
+            message: "Username and Email address already exist"
+        }
     },
 
     SUCCESS:{
         SUCCESS_USR_CREATED: {
             SUCCESS: "USR_CREATED",
             statusCode: 201,
-            message: "User has successfuly been created"
+            message: "User has successfuly been created",
+            token : (token) => token
         },
+        SUCCESS_USR_EXIST: {
+            SUCCESS: "USR_EXIST",
+            statusCode: 200,
+            message: "User exists",
+            token : (token) => token
+        }
      }
     
 }
