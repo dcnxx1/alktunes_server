@@ -25,6 +25,11 @@ module.exports = {
             ERR: "EMAIL_USER_EXIST",
             statusCode: 500,
             message: "Username and Email address already exist"
+        },
+        ERR_NO_ID : {
+            ERR: "NO_ID",
+            statusCode: 404,
+            message: "No corresponding ID found"
         }
     },
 
@@ -33,14 +38,13 @@ module.exports = {
             SUCCESS: "USR_CREATED",
             statusCode: 201,
             message: "User has successfuly been created",
-            token : (token) => token
         },
         SUCCESS_USR_EXIST: {
             SUCCESS: "USR_EXIST",
             statusCode: 200,
             message: "User exists",
-            token : (token) => token
-        }
+            user_id: (id) => id
+        },
      }
     
 }

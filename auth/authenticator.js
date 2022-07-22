@@ -1,12 +1,13 @@
 const jwt = require('jsonwebtoken')
-
+const {getId} = require('../db/queries')
 function jwtChecker(req, res, next) {
     try{
         const header = req.headers['authorization']
         const token = header.split(" ")[1]
         const checkedToken = jwt.verify(token, process.env.JWT_TOKEN)
-        
-        next(checkedToken)
+        req.token = checkedToken
+    
+        next()
     } catch(err){
         next("No token provided")
     }
@@ -14,17 +15,13 @@ function jwtChecker(req, res, next) {
 }
 
 
-function tokenGenerator(req,res,next){
-    const {username} = req.body
-    const token = jwt.sign(username , process.env.JWT_TOKEN)
-    req.token = token
-    next()
+function tokenify(user_id) {
+    return jwt.sign(user_id, process.env.JWT_TOKEN)
 }
-
 
 
 
 module.exports = {
     jwtChecker,
-    tokenGenerator
+    tokenify
 }

@@ -1,21 +1,20 @@
+const { default: axios } = require('axios')
 const express = require('express')
 const router = express.Router()
-const {jwtChecker, tokenGenerator} = require('../auth/authenticator')
+const {jwtChecker, tokenify} = require('../auth/authenticator')
 const {loginUser, registerUser} = require('../db/queries.js')
 const id = require('../misc/id.generator')
 
 
-
-
-
-router.post('/login', tokenGenerator, (req,res) => {
+router.post('/login', (req,res) => {
     const {username, password} = req.body
      
     loginUser({username, password}).then((result) => {
+
         res.json({
-            statusCode: result.statusCode,
-            token: result.token(req.token),
-            message: result.message
+            statusCode: result.statusCode, 
+            token: tokenify(result.user_id),
+            message: result.message 
         })
     }).catch((err) => {
         res.json({
@@ -28,13 +27,21 @@ router.post('/login', tokenGenerator, (req,res) => {
 
 
 
-router.post('/register', tokenGenerator, ( req,res) => {
+
+
+
+
+
+router.post('/register', ( req,res) => {
     const {username, password, email} = req.body
     
     registerUser({username, password, email}).then((result) => {
+        
         res.json({
+            SUCCESS: result.SUCESS,
             statusCode: result.statusCode,
-            token: result.token(req.token)
+            message: result.message,
+            token : tokenify(result.user_id)
         })
     }).catch((err) => {
         res.json({
@@ -50,4 +57,4 @@ router.post('/uuidtester', (req,res) => {
 
 
 
-module.exports = router
+module.exports = router 
