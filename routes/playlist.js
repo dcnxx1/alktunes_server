@@ -7,7 +7,6 @@ const LAMBDA_URL="https://3nxhmnntzd.execute-api.eu-central-1.amazonaws.com/stag
 
 router.get('/', jwtChecker, async (req,res) => {
     
-    
     const data = {
         params: {
             user_id: req.token
@@ -15,35 +14,26 @@ router.get('/', jwtChecker, async (req,res) => {
     }
 
     const playlistPromise = new Promise((resolve, reject) => {
-       axios.get(`${LAMBDA_URL}/playlist/getplaylist`, data).then((res) => {
-           const {Items : item} = res.data
-        console.log(res.data)
-           if(item[0].hasOwnProperty('playlists') === false){
-            resolve({
-                ERR: "NO_PLAYLIST",
-                statusCode: 403,
-                message: "You have no playlists",
-                playlists: []
-            })
-           } else {
-            const {playlists} = item[0]
+       axios.get(`${LAMBDA_URL}/playlist/getplaylist`, data).then((res) => {           
+        const {playlists} = res.data
 
-            resolve(playlists)
-           }
+            if(playlists.length < 1){
+                resolve([])
+            } else {
+                resolve(formatter(playlists))
+            }
 
-           resolve(item)
         }).catch((err) => {
             reject(err)
         })
     })
-
     const playlists = await playlistPromise
-    const formatToJs = formatter(playlists)
-    res.send(formatToJs)
+    res.send(playlists)
    
 })
 
 function formatter(playlistsArray){
+    try{ 
     const {L : playlistArray} = playlistsArray
     return playlistArray.map((playlist) => {
        let {S: playlist_id} =  playlist.M.playlist_id
@@ -55,6 +45,24 @@ function formatter(playlistsArray){
             playlist_tracks
         }
     })
+    } catch(err) {
+        //
+    }
+    
+}
+
+function formatterPlaylistCreated(playlistArray){
+    return playlistArray.map((playlist) =>{
+            let {S: playlist_id} =  playlist.M.playlist_id
+            let {S: playlist_name} = playlist.M.playlist_name
+            let {L: playlist_tracks} = playlist.M.playlist_tracks
+             return {
+                 playlist_id,
+                 playlist_name,
+                 playlist_tracks
+        }
+    })
+
 }
 
 
@@ -72,11 +80,12 @@ router.post('/create', jwtChecker, async (req,res) => {
         playlistName : req.body.playlistName
     }
     
+  
+        const getPlaylist = await axios.post(`${LAMBDA_URL}/playlist/createplaylist`, data, config)
+        const {L : playlist} = getPlaylist.data.Attributes.playlists
+        let formatted = formatterPlaylistCreated(playlist)
+        res.send(formatted)
     
-    const getPlaylist = await axios.post(`${LAMBDA_URL}/playlist/createplaylist`, data, config)
-    
-    res.send(getPlaylist.data)
-
 })
 
 module.exports = router
