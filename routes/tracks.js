@@ -5,12 +5,18 @@ const axios = require('axios')
 
 const LAMBDA_URL="https://3nxhmnntzd.execute-api.eu-central-1.amazonaws.com/stage1"
 
-router.get('/tracks', jwtChecker, (req,res) => {
-    const config = {params: {user_id: req.token}}
-    const data = {playlist_id : req.body.playlist_id}
-    axios.get(`${LAMBDA_URL}/tracks/gettracks`, data, config).then((res) => {
-    }) 
-
+router.get('/', jwtChecker, async (req,res) => {
+     const {playlist_id} = req.query
+    const config = {
+        params: {
+            user_id: req.token,
+            playlist_id
+        }
+    }
+    
+    const getPlaylistData = await axios.get(`${LAMBDA_URL}/tracks/gettracks`, config)
+    
+    res.send(getPlaylistData.data)
 
 })
 

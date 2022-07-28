@@ -68,8 +68,6 @@ function formatterPlaylistCreated(playlistArray){
 
 router.post('/create', jwtChecker, async (req,res) => {
 
-
-
     const config = {
         headers: {
             user_id: req.token
@@ -89,7 +87,6 @@ router.post('/create', jwtChecker, async (req,res) => {
 })
 
 router.post('/delete', jwtChecker, async (req,res) => {
-
     const config = {
         headers: {
             user_id : req.token
@@ -98,9 +95,10 @@ router.post('/delete', jwtChecker, async (req,res) => {
     const data = {
         playlists: req.body.playlists
     }
-   const getNewPlaylist =  await axios.post(`${LAMBDA_URL}/playlist/delete`, data, config )
-   const {L : playlist} = getNewPlaylist.data.Attributes.playlists 
-   const formatted = formatterPlaylistCreated(playlist)
+    
+    const getNewPlaylist =  await axios.post(`${LAMBDA_URL}/playlist/delete`, data, config )
+    const {L : playlist} = getNewPlaylist.data.Attributes.playlists 
+    const formatted = formatterPlaylistCreated(playlist)
    res.send(formatted)
 })
 

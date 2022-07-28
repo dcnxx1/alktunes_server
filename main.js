@@ -19,9 +19,9 @@ var corsOptions = {
 
 
 const routers = { 
-    entrance: require('./routes/entrance'),
-    playlist: require('./routes/playlist'),
-    tracks: require('./routes/tracks')
+  entrance: require('./routes/entrance'),
+  playlist: require('./routes/playlist'),
+  tracks  : require('./routes/tracks'  )
 }
 
 
@@ -30,6 +30,7 @@ const routers = {
 app.use(cors(corsOptions))
 app.use('/entrance', routers.entrance)
 app.use('/playlist', routers.playlist)
+app.use('/tracks'  ,   routers.tracks)
 
 
 
