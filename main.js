@@ -21,7 +21,8 @@ var corsOptions = {
 const routers = { 
   entrance: require('./routes/entrance'),
   playlist: require('./routes/playlist'),
-  tracks  : require('./routes/tracks'  )
+  tracks  : require('./routes/tracks'  ),
+  search  : require('./routes/search'  )
 }
 
 
@@ -30,7 +31,8 @@ const routers = {
 app.use(cors(corsOptions))
 app.use('/entrance', routers.entrance)
 app.use('/playlist', routers.playlist)
-app.use('/tracks'  ,   routers.tracks)
+app.use('/tracks'  , routers.tracks  )
+app.use('/search'  , routers.search  )
 
 
 
