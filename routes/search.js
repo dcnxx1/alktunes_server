@@ -11,179 +11,170 @@ let track_suggester = 'alktunes_tracksuggester'
 let album_suggester = 'alktunes_albumsuggester'
 let artist_suggester = 'alktunessuggester'
 
-let suggestFound = []
-let searchFound = {}
+let artistSuggestFound = []
+let artistSearchFound = []
 
 let albumSuggestFound = []
-let albumSearchFound = {}
+let albumSearchFound = []
+
 
 let trackSuggestFound = []
 let trackSearchFound = []
 
-// format artist array
-function formatter(searchDataArray, artistName){
-    const {hit : artistFoundArray} = searchDataArray.hits
-    const formatList = artistFoundArray.map(({fields}) => {
-        return fields
+function formatter(searchArray, type){
+ 
+    const { hit } =  searchArray.hits
+    artistSearchFound.push({
+        type: 'artist',
+        name: type,
+        searchResults : hit
     })
-
-    searchFound = {
-     artist_name: artistName,
-     artist_tracks : formatList
-    }
-      
-    return searchFound
-}
-// format album array
-function formatAlbum(searchAlbumArray){
-    const {hit : albumFoundArray}  = searchAlbumArray.hits
-    return albumFoundArray.map(({fields}) => {
-        return fields
-    })
+    return artistSearchFound 
 }
 
-function formatTrack(searchTrackArray) {
-    const {hit : trackArray}  = searchTrackArray.hits
-    return trackArray.map(({fields}) => {
-        return fields
+function albumFormatter(albumArray,album_name){
+    const {hit} = albumArray.hits
+    albumSearchFound.push({
+        type: 'album',
+        name: album_name,
+        searchResults: hit.map(({fields}) => fields)
+    })
+    return albumSearchFound
+}
+
+function trackSuggestFormatter(suggestionsArray){
+    return suggestionsArray.map(({suggestion}) => {
+        return {track_name : suggestion}
     })
 }
 
-// handler for when user is searching for artist
-async function predictArtistHandler(userInput){
-    let getArtistSuggester = await axios.get(SUGGEST_URL(userInput, artist_suggester))
-   
-    try{
-        // artist has been found by queries the artist
-     const { suggestions } = getArtistSuggester.data.suggest
-      
-     // if suggestions array is not empty 
-     if(suggestions.length >= 1){
+function trackFormatter(trackArray){
+    const { hit } = trackArray.hits
+    const getMatchTrack = hit.map(({fields}) => fields)
+    trackSearchFound.push({
+        type: 'track',
+        searchResults: getMatchTrack
+    })
+    return trackSearchFound
+}
 
-        // get artist_name from found prediction
-        const {suggestion: artist_name} = suggestions[0]
+async function handleArtist(userInput) {
+    const getArtistData = await axios.get(SUGGEST_URL(userInput, artist_suggester))
+    try {
+        const {suggestions} = getArtistData.data.suggest
+        if(suggestions.length === 0) return []
+        const { suggestion : artist_found } = getArtistData.data.suggest.suggestions[0] 
+        const checkArtistExists = artistSuggestFound.some(({artist}) => artist === artist_found)
 
-        //check if artist is already present in the suggestFound array
-        const artistAlreadySearched = suggestFound.some(({artist}) => artist == artist_name)
-
-        if(artistAlreadySearched === true){
-            // return the SearchFound array
-            return searchFound
+        if(checkArtistExists === true ){
+            return artistSearchFound
         } else {
-            // if there's an artist inside the suggestFound, remove it to prevent sending two different artist request
-            // at the same time
-            if(suggestFound.length >= 1) {
-                suggestFound.pop()
-                delete searchFound['artist_name']
-                delete searchFound['artist_tracks']
+            if(artistSuggestFound.length >= 1){
+                clearArtist()
             }
-            suggestFound.push({artist: artist_name})
-            // query for predicted artist and add it to the searchFound array
-            const getSearchQuery = await axios.get(SEARCH_URL(artist_name))
-            return formatter(getSearchQuery.data, artist_name)
-        }    
-        } else {
-            // return suggestions (which is an empty array) and move on to the next suggestion
-            // delete suggestionsArray
-            suggestFound = []
-            return suggestFound
-     }   
-
-    } catch (err) {
-        return new Error("ARTIST_NOT_FOUND " + err )
+            artistSuggestFound.push({artist: artist_found})
+            const getSearchedArtist = await axios.get(SEARCH_URL(artist_found))
+            return formatter(getSearchedArtist.data, artist_found)
+        }
+       
+    } catch(err){
+        console.log(err)
     }
 
-
+    clearArtist()
+    return []
 }
-// handler for when user is searching for album
-async function predictAlbumHandler(userInput){
-    const getAlbumSuggestion = await axios.get(SUGGEST_URL(userInput, album_suggester))
-    const {suggestions} = getAlbumSuggestion.data.suggest
-    
-    if(suggestions.length >= 1) {
-        const {suggestion : album_name} = suggestions[0]
+
+async function handleAlbum(userInput){
+    const getAlbumSuggester = await axios.get(SUGGEST_URL(userInput, album_suggester))
+    try{ 
+        const {suggestions} = getAlbumSuggester.data.suggest
+        if(suggestions.length < 1) return []
+        const { suggestion : album_name } = getAlbumSuggester.data.suggest.suggestions[0]
         const checkAlbumExists = albumSuggestFound.some(({album}) => album === album_name)
-        
-        if(checkAlbumExists == true){
+
+        if(checkAlbumExists === true ){
             return albumSearchFound
         } else {
             if(albumSuggestFound.length >= 1){
-                albumSuggestFound.pop()
-                delete albumSearchFound['album']
+                clearAlbum()
             }
+
             albumSuggestFound.push({album: album_name})
             const getAlbum = await axios.get(SEARCH_URL(album_name))
-            albumSearchFound.tracks = formatAlbum(getAlbum.data)
-            albumSearchFound.album = album_name
-            return albumSearchFound
+            return albumFormatter(getAlbum.data, album_name)
+        }
+
+    } catch(err) {
+        console.log(err)
+    }
+    
+}
+
+async function handleTrack(userInput){
+    const trackSuggester = await axios.get(SUGGEST_URL(userInput, track_suggester))
+    const { suggestions } = trackSuggester.data.suggest
+    if(suggestions.length < 1) return []
+    const {suggestion : trackFound} = suggestions[0]
+    const checkIfTrackExists = trackSuggestFound.some(({track_name}) => suggestions.indexOf(track_name))
+    
+    if(checkIfTrackExists === true ){
+        return trackSearchFound
+    } else {
+        if(trackSuggestFound.length >= 1){
+            clearTrack()
+        }  
+        const formattedSuggestion = trackSuggestFormatter(suggestions)
+        if(formattedSuggestion.length > 1){
+            trackSearchFound.push({
+                type: 'track',
+                tracks: formattedSuggestion
+            })
+            return trackSearchFound
+        } else {
+            clearTrack()
+            const getSpecificTrack = await axios.get(SEARCH_URL(trackFound))
+            return trackFormatter(getSpecificTrack.data)
         }
     }
-    // clear array because the user is not searching for album
-    
-    albumSuggestFound = []
-    delete albumSearchFound['album']
-    delete albumSearchFound['artist_tracks']
-    return albumSuggestFound
 }
-
-// handler for when user is searching for a track
-
-async function predictTrackHandler(userInput){
-    let trackSuggester = await axios.get(SUGGEST_URL(userInput, track_suggester))
-
-    try {
-        const { suggestions } = trackSuggester.data.suggest
-        
-        if(suggestions.length >= 1){
-            const {suggestion : track} = suggestions[0]
-            const trackExists = trackSuggestFound.some(({track_name}) => track_name == track)
-
-            if(trackExists.hasOwnProperty('track_name') === true ){
-                return trackSearchFound
-            } else {
-               if(trackSuggestFound.length >= 1){
-                trackSuggestFound.pop()
-                trackSearchFound.pop()
-               } 
-               trackSearchFound.push({track_name : track})
-               const getTrack = await axios.get(SEARCH_URL(track))
-               return formatTrack(getTrack.data)
-            }
-
-        }        
-        return []
-    } catch(err) {
-    //
-    }
-}
-
 
 async function predictInputHandler(input){
-    const lowered = input.toLowerCase()
-   try {
-    const artistSuggestions = await predictArtistHandler(lowered)
+    const lowered = input.toLowerCase().trim()
     
-    if(artistSuggestions.hasOwnProperty('artist_name') === true){
-        return artistSuggestions 
-    } else {
-        const albumSuggestion = await predictAlbumHandler(lowered)
-        if(albumSuggestion.hasOwnProperty('album') === true ){
-            return albumSuggestion
-        } else {
-            const suggesterTrack = await predictTrackHandler(lowered)
-            return suggesterTrack
-        }
+    try {
+        const artistHandler = await handleArtist(lowered)
+        if(artistHandler.length !== 0) return artistHandler
+        
+        const albumHandler = await handleAlbum(lowered)
+        if(albumHandler.length !== 0) return albumHandler
+        
+        const trackHandler = await handleTrack(lowered)
+        if(trackHandler.length !== 0) return trackHandler
+            
+        clearArrays()
+        return []
+ 
+    } catch(err){
+        console.log(err)
     }
-    
-   } catch(err) {
-    return new Error(err)
-   }
-
-    
+        
 }
 
+function clearArtist (){
+    artistSuggestFound = []
+    artistSearchFound = []
+}
 
+function clearAlbum (){
+    albumSuggestFound = []
+    albumSearchFound = []
+}
 
+function clearTrack (){
+    trackSuggestFound = []
+    trackSearchFound = []
+}
 
 
 router.get('/', async (req,res) => {
