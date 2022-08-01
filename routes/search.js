@@ -27,7 +27,7 @@ function formatter(searchArray, type){
     artistSearchFound.push({
         type: 'artist',
         name: type,
-        searchResults : hit
+        searchResults : hit.map(({fields}) => fields)
     })
     return artistSearchFound 
 }
@@ -60,9 +60,13 @@ function trackFormatter(trackArray){
 
 async function handleArtist(userInput) {
     const getArtistData = await axios.get(SUGGEST_URL(userInput, artist_suggester))
+
     try {
         const {suggestions} = getArtistData.data.suggest
-        if(suggestions.length === 0) return []
+        if(suggestions.length === 0 || suggestions === undefined) {
+            clearArtist()
+            return []
+        }
         const { suggestion : artist_found } = getArtistData.data.suggest.suggestions[0] 
         const checkArtistExists = artistSuggestFound.some(({artist}) => artist === artist_found)
 
@@ -78,11 +82,9 @@ async function handleArtist(userInput) {
         }
        
     } catch(err){
-        console.log(err)
+    console.log(err)
     }
-
-    clearArtist()
-    return []
+   
 }
 
 async function handleAlbum(userInput){
@@ -106,7 +108,7 @@ async function handleAlbum(userInput){
         }
 
     } catch(err) {
-        console.log(err)
+       console.log(err)
     }
     
 }
@@ -145,13 +147,13 @@ async function predictInputHandler(input){
     try {
         const artistHandler = await handleArtist(lowered)
         if(artistHandler.length !== 0) return artistHandler
-        
+        clearArtist()        
         const albumHandler = await handleAlbum(lowered)
         if(albumHandler.length !== 0) return albumHandler
-        
+        clearAlbum()
         const trackHandler = await handleTrack(lowered)
         if(trackHandler.length !== 0) return trackHandler
-            
+        
         clearArrays()
         return []
  
@@ -176,11 +178,29 @@ function clearTrack (){
     trackSearchFound = []
 }
 
+function clearArrays(){
+    clearArtist()
+    clearAlbum()
+    clearTrack()
+}
+
+
+function checkInput (string) {
+    if((/[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/).test(string) === true) return false
+    return true
+}
 
 router.get('/', async (req,res) => {
     const {search} = req.query
-    const got = await predictInputHandler(search)
-    res.send(got)
+    if(search !== "" && /\uFFFD/g.test(search) === false && checkInput(search) === true) {
+        const got = await predictInputHandler(search.trim())
+        res.send(got)
+    } else {
+        clearArrays()
+        console.log("found nuffing so...")
+        res.send([{'OEFF': "DOEFFF"}])
+    }
+    
 })
 
 
