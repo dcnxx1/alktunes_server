@@ -20,9 +20,33 @@ router.get('/', jwtChecker, async (req,res) => {
 
 })
 
+// TODO : handle if recieved is empty;
+router.get('/artist', async (req,res) => {
+    const data = {
+        params : {
+            artist_name : req.query.artist,
+            type: req.query.type
+        }   
+    }
+    try {
+    const recieved = await axios.get(`${LAMBDA_URL}/tracks/artist`, data)
+    res.send(recieved.data)
+    } catch(err) {
+        console.log(err)
+    }
+})
 
-
-
+router.post('/upload', jwtChecker, (req,res) => {
+    const data = {
+        user_id : req.token,
+        playlist_id : req.body.playlist_id[0].id,
+        track:  req.body.track
+    }
+    axios.post(`${LAMBDA_URL}/tracks/upload`, data).then((res) => {
+        console.log(res.data)
+    })
+   
+})
 
 
 module.exports = router

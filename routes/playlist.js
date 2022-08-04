@@ -12,7 +12,7 @@ router.get('/', jwtChecker, async (req,res) => {
             user_id: req.token
         }
     }
-
+    console.log("getted")
     const playlistPromise = new Promise((resolve, reject) => {
        axios.get(`${LAMBDA_URL}/playlist/getplaylist`, data).then((res) => {           
         const {playlists} = res.data
