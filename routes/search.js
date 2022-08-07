@@ -197,8 +197,7 @@ router.get('/', async (req,res) => {
         res.send(got)
     } else {
         clearArrays()
-        console.log("found nuffing so...")
-        res.send([{'OEFF': "DOEFFF"}])
+        res.send([])
     }
     
 })

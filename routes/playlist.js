@@ -12,12 +12,11 @@ router.get('/', jwtChecker, async (req,res) => {
             user_id: req.token
         }
     }
-    console.log("getted")
     const playlistPromise = new Promise((resolve, reject) => {
        axios.get(`${LAMBDA_URL}/playlist/getplaylist`, data).then((res) => {           
         const {playlists} = res.data
 
-            if(playlists.length < 1){
+            if(playlists && playlists.length < 1){
                 resolve([])
             } else {
                 resolve(formatter(playlists))
@@ -25,6 +24,7 @@ router.get('/', jwtChecker, async (req,res) => {
 
         }).catch((err) => {
             reject(err)
+            console.log(err)
         })
     })
     const playlists = await playlistPromise
@@ -95,11 +95,12 @@ router.post('/delete', jwtChecker, async (req,res) => {
     const data = {
         playlists: req.body.playlists
     }
-    
+    //  TODO check playlist request
     const getNewPlaylist =  await axios.post(`${LAMBDA_URL}/playlist/delete`, data, config )
     const {L : playlist} = getNewPlaylist.data.Attributes.playlists 
     const formatted = formatterPlaylistCreated(playlist)
-   res.send(formatted)
+    // console.log(formatted)
+    res.send(formatted)
 })
 
 module.exports = router
