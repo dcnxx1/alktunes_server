@@ -13,11 +13,11 @@ router.get('/', jwtChecker, async (req,res) => {
             playlist_id
         }
     }
-    console.log("This hit")
+
     const getPlaylistData = await axios.get(`${LAMBDA_URL}/tracks/gettracks`, config)
     const playlistData = getPlaylistData.data
 
-console.log(playlistData)
+
     res.send({
         playlist_id : playlistData.playlist_id,
         playlist_name: playlistData.playlist_name,
@@ -66,13 +66,24 @@ router.post('/delete', jwtChecker, (req,res) => {
             const {L : playlist_tracks} = response.data.Attributes.playlists
 
             let formattedTracks = updatedTracks(playlist_tracks, data.playlistId)
-           
+            console.log(formattedTracks)
             res.send(formattedTracks) 
         } catch(err){ 
             console.log(err)
         }   
     })
     
+})
+
+
+router.get('/tracktalker', async (req,res) => {
+    try {
+        let getTracks = await axios.get(`${LAMBDA_URL}/tracks/tracktalker`)
+        res.send(getTracks.data)
+    } catch(err){
+        res.send([])
+    }
+        
 })
 
 module.exports = router
