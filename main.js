@@ -6,7 +6,7 @@ const PORT = process.env.CUSTOM_PORT || 5054
 
 app.use(express.json())
 
-var whitelist = [process.env.CORS_HOST_BROAD, process.env.CORS_HOST_LOCAL, process.env.CORS_ALL]
+var whitelist = ['*']
 var corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
