@@ -61,6 +61,6 @@ function normalConnection () {
 }
 
 module.exports = (APP_ENV) => {
-    return APP_ENV == 'dev' ? SSHConnect : normalConnection
+    return APP_ENV === 'dev' ? SSHConnect : normalConnection
 }
 

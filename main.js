@@ -33,6 +33,13 @@ app.use('/entrance', routers.entrance)
 app.use('/playlist', routers.playlist)
 app.use('/tracks'  , routers.tracks  )
 app.use('/search'  , routers.search  )
+app.get('/', jwtChecker, (req,res) => {
+  if(req.token === undefined){
+    res.sendStatus(403)
+  } else {
+    res.sendStatus(200)
+  }
+})
 
 
 
