@@ -2,7 +2,7 @@ const express = require('express')
 const {jwtChecker, tokenify} = require('../auth/authenticator')
 const router = express.Router()
 const axios = require('axios')
-
+const {trackFormatter} = require('../helper')
 const LAMBDA_URL="https://3nxhmnntzd.execute-api.eu-central-1.amazonaws.com/stage1"
 
 router.get('/', jwtChecker, async (req,res) => {
@@ -39,10 +39,11 @@ function formatter(playlistsArray){
        let {S: playlist_id} =  playlist.M.playlist_id
        let {S: playlist_name} = playlist.M.playlist_name
        let {L: playlist_tracks} = playlist.M.playlist_tracks
+       let formatTracks = trackFormatter(playlist_tracks)
         return {
             playlist_id,
             playlist_name,
-            playlist_tracks
+            playlist_tracks : formatTracks
         }
     })
     } catch(err) {
@@ -99,7 +100,6 @@ router.post('/delete', jwtChecker, async (req,res) => {
     const getNewPlaylist =  await axios.post(`${LAMBDA_URL}/playlist/delete`, data, config )
     const {L : playlist} = getNewPlaylist.data.Attributes.playlists 
     const formatted = formatterPlaylistCreated(playlist)
-    // console.log(formatted)
     res.send(formatted)
 })
 

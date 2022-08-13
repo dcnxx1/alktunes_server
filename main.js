@@ -6,7 +6,7 @@ const PORT = process.env.CUSTOM_PORT || 5054
 
 app.use(express.json())
 
-var whitelist = ['*']
+var whitelist = [process.env.CORS_HOST_BROAD, process.env.CORS_HOST_LOCAL, process.env.CORS_ALL]
 var corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
@@ -33,17 +33,11 @@ app.use('/entrance', routers.entrance)
 app.use('/playlist', routers.playlist)
 app.use('/tracks'  , routers.tracks  )
 app.use('/search'  , routers.search  )
-app.get('/', jwtChecker, (req,res) => {
-  if(req.token === undefined){
-    res.sendStatus(403)
-  } else {
-    res.sendStatus(200)
-  }
-})
+
 
 
 
 
 app.listen(PORT, () => {
-    console.log("Server started on port " + PORT )
+   
 })

@@ -49,7 +49,10 @@ router.post('/upload', jwtChecker, (req,res) => {
         track:  req.body.track
     }
     axios.post(`${LAMBDA_URL}/tracks/upload`, data).then((tracksResponse) => {
-       
+       const {L : playlists} = tracksResponse.data.Attributes.playlists
+       let formattedTracks = updatedTracks(playlists, data.playlist_id)
+
+       res.send(formattedTracks)
     })
    
 })
@@ -66,7 +69,6 @@ router.post('/delete', jwtChecker, (req,res) => {
             const {L : playlist_tracks} = response.data.Attributes.playlists
 
             let formattedTracks = updatedTracks(playlist_tracks, data.playlistId)
-            console.log(formattedTracks)
             res.send(formattedTracks) 
         } catch(err){ 
             console.log(err)
