@@ -1,4 +1,4 @@
-const { default: axios } = require('axios')
+
 const express = require('express')
 const router = express.Router()
 const {jwtChecker, tokenify} = require('../auth/authenticator')
@@ -8,7 +8,7 @@ const id = require('../misc/id.generator')
 
 router.post('/login', (req,res) => {
     const {username, password} = req.body
-     
+   
     loginUser({username, password}).then((result) => {
 
         res.json({
