@@ -1,4 +1,3 @@
-
 const express = require('express')
 const router = express.Router()
 const {jwtChecker, tokenify} = require('../auth/authenticator')
@@ -7,8 +6,9 @@ const id = require('../misc/id.generator')
 
 
 router.post('/login', (req,res) => {
+    
     const {username, password} = req.body
-   
+   try {
     loginUser({username, password}).then((result) => {
 
         res.json({
@@ -22,6 +22,10 @@ router.post('/login', (req,res) => {
             message: err.message
         })
     })
+   } catch(err) {
+    console.log(err)
+   }
+    
     
 })
 

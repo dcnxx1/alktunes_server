@@ -5,7 +5,8 @@ const axios = require('axios')
 const {trackFormatter, updatedTracks} = require('../helper')
 const LAMBDA_URL="https://3nxhmnntzd.execute-api.eu-central-1.amazonaws.com/stage1"
 
-router.get('/', jwtChecker, async (req,res) => {
+
+router.get('/',  jwtChecker, async (req,res) => {
      const {playlist_id} = req.query
     const config = {
         params: {
@@ -42,7 +43,7 @@ router.get('/artist', async (req,res) => {
     }
 })
 
-router.post('/upload', jwtChecker, (req,res) => {
+router.post('/upload',  jwtChecker, (req,res) => {
     const data = {
         user_id : req.token,
         playlist_id : req.body.playlist_id[0].id,
@@ -58,7 +59,7 @@ router.post('/upload', jwtChecker, (req,res) => {
 })
 
 
-router.post('/delete', jwtChecker, (req,res) => {
+router.post('/delete',  jwtChecker, (req,res) => {
     const data = {
         user_id : req.token,
         tracksDeleteId : req.body.tracksToDelete,
@@ -78,7 +79,7 @@ router.post('/delete', jwtChecker, (req,res) => {
 })
 
 
-router.get('/tracktalker', async (req,res) => {
+router.get('/tracktalker',  async (req,res) => {
     try {
         let getTracks = await axios.get(`${LAMBDA_URL}/tracks/tracktalker`)
         res.send(getTracks.data)

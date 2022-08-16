@@ -3,9 +3,10 @@ const codes = require('../errors/response.codes')
 const LAMBDA_URL="https://3nxhmnntzd.execute-api.eu-central-1.amazonaws.com/stage1"
 const id = require('../misc/id.generator')
 const axios = require('axios')
+
 async function loginUser({username, password}) { 
+
    const mysqlCon = await connection
-   
    return new Promise((resolve, reject) => {
      mysqlCon.query(`SELECT user_id, username, password FROM alktunes_users WHERE username=? AND password=?`, [username, password], (err, results, fields) => {
       err || results.length == 0 ? reject(codes.ERRORS.ERR_USR_NOT_EXIST) 
@@ -16,6 +17,7 @@ async function loginUser({username, password}) {
          user_id: codes.SUCCESS.SUCCESS_USR_EXIST.user_id(results[0].user_id),   
         })
      })
+   
    })
    
 }

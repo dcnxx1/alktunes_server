@@ -5,7 +5,8 @@ const axios = require('axios')
 const {trackFormatter} = require('../helper')
 const LAMBDA_URL="https://3nxhmnntzd.execute-api.eu-central-1.amazonaws.com/stage1"
 
-router.get('/', jwtChecker, async (req,res) => {
+
+router.get('/', jwtChecker,  async (req,res) => {
     
     const data = {
         params: {
@@ -67,7 +68,7 @@ function formatterPlaylistCreated(playlistArray){
 }
 
 
-router.post('/create', jwtChecker, async (req,res) => {
+router.post('/create',  jwtChecker, async (req,res) => {
 
     const config = {
         headers: {
@@ -87,7 +88,7 @@ router.post('/create', jwtChecker, async (req,res) => {
     
 })
 
-router.post('/delete', jwtChecker, async (req,res) => {
+router.post('/delete',  jwtChecker, async (req,res) => {
     const config = {
         headers: {
             user_id : req.token
