@@ -3,10 +3,11 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const PORT = process.env.CUSTOM_PORT || 5054
-const {validateToken} = require('./auth/authenticator')
+
+
 app.use(express.json())
 
-var whitelist = [process.env.CORS_HOST_BROAD, process.env.CORS_HOST_LOCAL, process.env.CORS_ALL]
+var whitelist = ["https://alktunes.com", "https://www.alktunes.com", "https://main-test.d11je8s01usxm2.amplifyapp.com"]
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {

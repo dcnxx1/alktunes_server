@@ -10,12 +10,12 @@ router.post('/login', (req,res) => {
     const {username, password} = req.body
    try {
     loginUser({username, password}).then((result) => {
-
         res.json({
             statusCode: result.statusCode, 
             token: tokenify(result.user_id),
             message: result.message 
         })
+	console.log(result)
     }).catch((err) => {
         res.json({
             statusCode: err.statusCode,

@@ -8,7 +8,7 @@ function jwtChecker(req, res, next) {
         req.token = checkedToken
         next()
     } catch(err){
-       next("FORBIDDEN")
+       next()
     }
 
 }
