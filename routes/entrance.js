@@ -55,9 +55,7 @@ router.post('/register', ( req,res) => {
     })   
 })
 
-router.post('/uuidtester', (req,res) => {
-    res.send(id())
-})
+
 
 
 
