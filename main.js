@@ -18,7 +18,6 @@ const corsOptions = {
 }    
 
 const routers = { 
-  default : require('./routes/default' ),
   entrance: require('./routes/entrance'),
   playlist: require('./routes/playlist'),
   tracks  : require('./routes/tracks'  ),
@@ -28,21 +27,13 @@ const routers = {
 
 
 app.use(cors(corsOptions))
-app.use('/',         routers.default )
+
 app.use('/entrance', routers.entrance)
 app.use('/playlist', routers.playlist)
 app.use('/tracks'  , routers.tracks  )
 app.use('/search'  , routers.search  )
 
 
-
-app.use('/validator', validateToken, (req,res) => {
-  if(req.token === "NO_TOKEN"){
-    res.send(false)
-  } else {
-    res.send(true)
-  }
-})
 
 
 
