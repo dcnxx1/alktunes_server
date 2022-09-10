@@ -11,18 +11,6 @@ const dbServer = {
     queueLimit : 0
 }
 
+   module.exports = mysql.createPool(dbServer)
 
 
-
-// module.exports = new Promise((resolve, reject) => {
-//     const mysqlConnection = mysql.createConnection(dbServer)
-//         mysqlConnection.connect((err, connection) => {
-//             if(err){
-//                 reject(err)
-//             }
-//             resolve(mysqlConnection)
-//         })
-//     })  
-    
-    
-    module.exports = mysql.createPool(dbServer)
