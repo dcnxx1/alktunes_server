@@ -3,10 +3,11 @@ const jwt = require('jsonwebtoken')
 function jwtChecker(req, res, next) {
     try{
         const header = req.headers['authorization']
-        const token = header.split(" ")[1]
+	const token = header.split(" ")[1]
         const checkedToken = jwt.verify(token, process.env.JWT_TOKEN)
         req.token = checkedToken
-        next()
+        
+	next()
     } catch(err){
        next()
     }

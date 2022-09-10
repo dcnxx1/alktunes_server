@@ -1,26 +1,38 @@
-const connection = require('../db/db')(process.env.APP_ENV)
-const codes = require('../errors/response.codes')
-const LAMBDA_URL="https://3nxhmnntzd.execute-api.eu-central-1.amazonaws.com/stage1"
-const id = require('../misc/id.generator')
-const axios = require('axios')
+const  connection  =           require('../db/db')
+const codes =                  require('../errors/response.codes')
+const LAMBDA_URL=              "https://3nxhmnntzd.execute-api.eu-central-1.amazonaws.com/stage1"
+const id =                     require('../misc/id.generator')
+const axios =                  require('axios')
 
 async function loginUser({username, password}) { 
-
-   const mysqlCon = await connection
+   const mysqlCon = connection
+   try {
+   
    return new Promise((resolve, reject) => {
-     mysqlCon.query(`SELECT user_id, username, password FROM alktunes_users WHERE username=? AND password=?`, [username, password], (err, results, fields) => {
-      err || results.length == 0 ? reject(codes.ERRORS.ERR_USR_NOT_EXIST) 
-        : resolve({
+     mysqlCon.query(`SELECT user_id, username, password FROM alktunes_users WHERE username= ? AND password= ?`, [username, password], (err, results, fields) => {
+      if(err) {
+         console.log('ERR REJECTED on LOGIN QUERY: ' + err)
+          reject(codes.ERRORS.ERR_USR_NOT_EXIST)
+      }
+      if(results.length < 1) {
+         reject(codes.ERRORS.ERR_USR_NOT_EXIST)
+      }
+          resolve({
          SUCCESS: codes.SUCCESS.SUCCESS_USR_EXIST.SUCCESS,
          statusCode: codes.SUCCESS.SUCCESS_USR_EXIST.statusCode,   
          message: codes.SUCCESS.SUCCESS_USR_EXIST.message,   
-         user_id: codes.SUCCESS.SUCCESS_USR_EXIST.user_id(results[0].user_id),   
+         user_id: codes.SUCCESS.SUCCESS_USR_EXIST.user_id(results[0].user_id)   
         })
      })
+      
+   })   
+   } catch(err) {
+     console.log(err) 
+   }
    
-   })
    
 }
+
 
 // sets up user for dynamodb
 function createUserForPlaylist(user_id){
@@ -29,9 +41,8 @@ function createUserForPlaylist(user_id){
           user_id: user_id  
       }
 }
-   const data = {
-   s: null
-   }
+ 
+ const data = { s: null }
  axios.post(`${LAMBDA_URL}/playlist/create`, data, config)
    
 }
@@ -39,9 +50,14 @@ function createUserForPlaylist(user_id){
 
 
 async function registerUser({username, password, email}) {
-   const mysqlCon = await connection
+   const mysqlCon = connection
    return new Promise((resolve, reject) => {
       mysqlCon.query('SELECT username, email from alktunes_users WHERE username=? OR email =?', [username, email], (err, results, fields) => {
+         if(err) {
+            console.log(`err on queries.js:57 ` + err)
+            reject(codes.ERRORS.ERR_NO_ID)
+         }
+         
          // if not records found, the user has been created. username, email, password will be stored as the newly created user
          const result = results[0]
          
@@ -67,6 +83,7 @@ async function registerUser({username, password, email}) {
                statusCode: codes.SUCCESS.SUCCESS_USR_CREATED.statusCode,
                user_id : generatedId
             })
+            
          }
       })
    })
@@ -74,9 +91,13 @@ async function registerUser({username, password, email}) {
 
 
 async function getId(username){
-const mysqlCon = await connection
+const mysqlCon =  connection
    return new Promise((resolve, reject) => {
       mysqlCon.query(`SELECT user_id from alktunes_users where username=?`, [username], (err, results, _ ) => {
+         if(err){
+            console.log('err occured : queries.js: 93: ' + err)
+            reject(codes.ERRORS.ERR_NO_ID)
+         }
          if(results.length == 0) {
             reject(codes.ERRORS.ERR_NO_ID)
          } else {
@@ -87,8 +108,9 @@ const mysqlCon = await connection
                message: codes.SUCCESS.SUCCESS_ID_FOUND.message,
                user_id: codes.SUCCESS.SUCCESS_ID_FOUND.user_id(results[0].user_id)
             })
+        
          }
-      })
+      }) 
    })
 }
 
