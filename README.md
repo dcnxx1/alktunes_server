@@ -1,6 +1,6 @@
 # Alktunes🎵 - A more technical review 🤖!
 
-## Create playlists, add tracks to your newly created playlists -- and relax ☺
+## Create playlists, add tracks to your created playlists, play -- and relax ☺
 
 ### This application is built using React, NodeJS and AWS. 
 
@@ -13,7 +13,7 @@ to get a grasp. GCP on the other hand has a more lenient learning curve. I have 
 
 But nothing tops AWS!
 
-It's the leading cloud computing service for a good reason. A lot of the documentation is clear and straightforward. AWS offers a lot of services and is free-tier friendly.
+A lot of the documentation is clear and straightforward. AWS offers a lot of services and is free-tier friendly.
 Thats why it's my primary choice for application hosting and infrastucture building. 
 
 ----
@@ -43,6 +43,20 @@ Let's start with the services that lets requests flow smoothly through the cloud
  But thats not all. I also PM2, which is a daemon tool to let the webserver up and running. 
  
  ---
+ 
+### RDS
+ #### MySQL
+
+For storing and retrieving user credentials.
+ 
+ ---
+ 
+### API Gateway 
+
+To route requests to the Lambda functions
+ 
+--- 
+ 
 Let's move onto the Lambda functions 
 
 ### Lambda 
@@ -51,11 +65,56 @@ Let's move onto the Lambda functions
    2. Lambda function to handle CRUD operations on a track.
    3. Lambda function to shuffle content for the homepage
    
-  All these 3 lambda functions communicate to a DynamoDB databse, which is ofcourse a NoSQL database. 
-  
-As I've stated earlier, they perfrom CRUD operations. But what exactly do they put and retrieve from the database? 
- The playlist lambda function handles everything related to creating and deleting playlists. 
-  
+These 3 lambda function communicate with the DynamoDB instance where all the tracks, playlists and the shuffled
+tracks are stored. 
+
+---
+### DynamoDB 
+
+#### NoSQL
+
+There are 3 tables in my DynamoDB instance: 
+ 1. Table for storing user playlists 
+ 2. Table for storing all the songs available. 
+ 3. The shuffled content recieved from the lambda function 
+
+---
+
+I've also added a search engine 
+
+### CloudSearch
+
+#### Search engine  
+
+I picked CloudSearch over OpenSearch -- which is another search engine service available on AWS, because of it's
+simplicity. I've indexed all the tracks so users can search by: 
+ 1. Artist name
+ 2. Track name
+ 3. Album name
+
+---
+
+### Event Bridge
+ #### Event bus
+ 
+ The Event Bridge instance triggers the lambda function for shuffling tracks every 3 hours. This simulates user activity and it's as if the content in the homepage is based on user data. '
+ 
+ ---
+ 
+ ### S3 
+ #### File storage. 
+ 
+ For storing MP3 sources and album covers
+
+---
+
+Here is a visual of the above: 
+
+
+
+
+![alt text](https://raw.githubusercontent.com/dcnxx1/alktunes_server/main/infrastrucutre/alktunes_infrastructure.png "Link to visual")
+ 
 
 
  
